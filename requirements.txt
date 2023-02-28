@@ -3,3 +3,4 @@ dill
 PyYAML
 streamlit_authenticator
 SpeechRecognition
+PyAudio
