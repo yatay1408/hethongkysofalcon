@@ -4,7 +4,7 @@ import time
 import dill
 import yaml
 import streamlit_authenticator as stauth
-from audio_recorder_streamlit import audio_recorder
+#from audio_recorder_streamlit import audio_recorder
 import speech_recognition as sr
 import sys
 
