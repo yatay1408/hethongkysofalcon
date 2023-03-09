@@ -7,7 +7,8 @@ import streamlit_authenticator as stauth
 #from audio_recorder_streamlit import audio_recorder
 import speech_recognition as sr
 import sys
-
+from audio_recorder_streamlit import audio_recorder
+import os
 st.set_page_config(
     page_title="Ký số nội dung giọng nói",
     page_icon="🎤",
@@ -44,16 +45,21 @@ if authentication_status:
     pk = falcon.PublicKey(sk)
 
     #Ký số giọng nói
-    st.header(f"**Mời bạn nói**")
-    if st.button('Bấm Để Nói'):
+  
+    audio_bytes = audio_recorder()
+    if audio_bytes:
+        with open('myfile.wav', mode='bx') as f:
+            f.write(audio_bytes)
+    # display audio data as received on the backend
         r = sr.Recognizer()
-        with sr.Microphone() as source:
-            r.adjust_for_ambient_noise(source)
-            audio = r.listen(source)
-            text = r.recognize_google(audio, language= "vi-VN")
+        audiowav=sr.AudioFile('myfile.wav')
+        with audiowav as source:
+             audio = r.record(audiowav)
+             text = r.recognize_google(audio, language= "vi-VN")
             
         if (len(sys.argv)>1):
                 text=str(sys.argv[1])
+        os.remove('myfile.wav')
         sig = sk.sign(text.encode('UTF-8'))
         st.header("Chữ ký số là:")
         st.code(str(sig.hex()))
@@ -63,4 +69,5 @@ if authentication_status:
             btn = st.download_button(label='Tải chữ ký',
                                         data=file,
                                         file_name='chukyfalcon.sig')
+
     authenticator.logout('Thoát', 'main')
